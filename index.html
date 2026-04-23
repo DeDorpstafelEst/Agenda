@@ -1,34 +1,362 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfolio Stichting Dorpstafel Est</title>
+    <script>
+     </script>
+    <title>Dorpshuis Agenda</title>
+    <style>
+        html {
+            background-color: transparent;
+            font-Size: 21px;
+            Width: 1520px;
+            height: 850px; /*1020px*/
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: transparent;
+            margin: 0;
+            padding: 0;
+            Width: 100%;
+            height: 100%; /*1020px*/
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            /* background: url('http://ncie.nl/dorpshuis.jpg') no-repeat top center fixed;
+                    background-size: cover;*/
+        }
+
+        .container {
+            background-color: transparent;
+            /* padding: 20px;
+                    border-radius: 10px;*/
+            max-width: 98%;
+            width: 98%;
+            max-height: 98%;
+            height: 98%;
+            margin-Left: 5%;
+            margin-right: 5%;
+            margin-bottom: 1%;
+            /* box-shadow: 0 0 10px rgba(90, 90, 90, 0.3);*/
+            color: rgba(0, 254, 212, 1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #FF0;
+        }
+
+        .appointments {
+            background-color: transparent;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            font-size: 1.4rem;
+            margin-top: 0em;
+        }
+
+        .columnleft {
+            background-color: transparent;
+            margin-left: 1%;
+            width: 45%;
+        }
+
+        .columnright {
+            background-color: transparent;
+            margin-right: 1%;
+            width: 45%;
+        }
+
+        .appointment {
+            background-color: transparent;
+            margin-block-start: 0.5em;
+            margin: 0;
+            padding: 1px 0;
+            font-size: 1.2rem;
+        }
+
+        .current {
+            background-color: transparent;
+            font-weight: bold;
+            background: rgba(200, 200, 200, 0.5);
+            font-size: 1.4rem;
+            border-radius: 5px;
+        }
+
+        .date {
+            background-color: transparent;
+            font-weight: bold;
+            background: rgba(248, 234, 234, 0.1);
+            color: rgb(0, 195, 255);
+            font-size: 1.2rem;
+            border-radius: 5px;
+            text-align: left;
+            border: 0px solid #ffffff;
+            margin: 0;
+            margin-top: 0.5rem;
+            padding: 3px;
+        }
+
+        .time {
+            background-color: transparent;
+            color: #d2e665;
+            font-size: 0.8rem;
+            margin: 0;
+            padding: 0px;
+        }
+
+        .title {
+            background-color: transparent;
+            color: #04e8f8;
+            font-size: 1.2rem;
+            padding: 3px;
+        }
+
+        .location {
+            background-color: transparent;
+            color: #e8ebdc;
+            font-size: 0.8rem;
+            margin: 0;
+            padding: 0px;
+        }
+
+        .loading {
+            background-color: transparent;
+            text-align: center;
+            color: #fff;
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <h1>My Portfolio</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Stichting Dorpstafel Est</h2>
-            <p>Deze pagina is de 'landing page' voor de publieke pagina's voor de Dorpstafel van het dorp Est (Gld)!</p>
-        </section>
-        <section>
-            <h2>Projects</h2>
-            <ul>
-                <li><a href="DorpsAgenda.html#">Dorps Agenda</a></li>
-                <li><a href="BewonersEst.html#">Informatie WhatsApp groep voor bewoners</a></li>
-                <li><a href="BuurtpreventieEst.html#">Buurtpreventie WhatsApp groep voor bewoners<</a></li>
-            </ul>
-        </section>
-        <section>
-            <h2>Contact</h2>
-            <p>None</p>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2026 Stichting Dorpstafel Est</p>
-    </footer>
+<body >
+    <div class="container" ">
+        <!--<h1>Dorpshuis Agenda</h1>-->
+        <div class="appointments" id="appointments">
+            <!--  <div class="loading">Laden gegevens...</div>-->
+        </div>
+    </div>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+        const mode = 'AI';
+        const CALENDAR_ID = '38807ec8b5d8e2de18be15619d9d201495019050a2720b951139b51a700c6cc6@group.calendar.google.com';
+        let API_KEY = 'zaSyBNyEAX1JaxagMNtZFMA0t4NauG2yYJBlY'
+        let currentAppointmentEnd = null;
+        let maxLines = 15; // Maximaal aantal regels (inclusief datums)
+        
+        // Handle background color from URL parameter FIRST
+        const backgroundValue = getParam('bg');
+        const useBG = (typeof backgroundValue === 'string' && backgroundValue.trim() !== '');
+        if (useBG) {
+            document.body.style.backgroundColor = backgroundValue.trim();
+            maxLines = 100
+        } else {
+            document.body.style.backgroundColor = "transparent";
+        }
+      
+      
+        function getParam(paramName) {
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            const value = urlParams.get(paramName);
+            if (value === null) {
+                return "";
+            } else {
+                return value;
+            }
+        }
+
+        function initCalendar() {
+            gapi.load('client', function () {
+                gapi.client.setApiKey(mode + API_KEY);
+                gapi.client.load('calendar', 'v3').then(function () {
+                    loadEvents();
+                }).catch(function (error) {
+                    console.error('Fout bij laden van API:', error);
+                    document.getElementById('appointments').innerHTML = '<div class="loading">Fout bij laden van gegevens. Controleer of de gegevens publiek zijn.</div>';
+                });
+            });
+        }
+
+        function loadEvents() {
+            const now = new Date();
+            const endDate = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000); // 51 dagen vooruit
+
+            const request = gapi.client.calendar.events.list({
+                'calendarId': CALENDAR_ID,
+                'timeMin': now.toISOString(),
+                'timeMax': endDate.toISOString(),
+                'showDeleted': false,
+                'singleEvents': true,
+                'orderBy': 'startTime',
+                'maxResults':  useBG ? 150 : (maxLines * 2) + 20 // Max 50 + 1 (huidige) 
+            });
+
+            request.execute(function (response) {
+                if (response && response.error) {
+                    console.error('API fout:', response.error);
+                    if (response.error.code === 403) {
+                        showError('Toegang geweigerd (403). De gegevens zijn mogelijk niet publiek gedeeld of de API key heeft geen toegang tot deze gegevens.');
+                    } else if (response.error.code === 404) {
+                        showError('gegevens niet gevonden (404). Controleer de kalender-ID.');
+                    } else {
+                        showError('Fout bij ophalen van gegevens: ' + response.error.message);
+                    }
+                    return;
+                }
+                const events = response ? response.items || [] : [];
+                displayEvents(events);
+                scheduleRefresh(events);
+            });
+
+        }
+
+        function displayEvents(events) {
+            if (!events || events.length === 0) {
+                document.getElementById('appointments').innerHTML = '<div class="loading">Geen gegevens gevonden.</div>';
+                return;
+            }
+
+            const now = new Date();
+            let currentFound = false;
+            let htmlLeft = '';
+            let htmlRight = '';
+            let lines = 0;
+            let eventGroups = {};
+
+            // Group events by date
+            events.forEach(event => {
+                const start = new Date(event.start.dateTime || event.start.date);
+                // const dateStr = start.toLocaleString('nl-NL', { weekday: 'long' })+', '+ start.toLocaleString('nl-NL', { day: '2-digit', month: '2-digit' });
+                const dateStr = start.toLocaleString('nl-NL', { weekday: 'long' }) + ', ' + start.toLocaleString('nl-NL', { day: 'numeric', month: 'long' });
+                //Intl.DateTimeFormat('nl-NL', { month: 'long' }).format(date);
+                if (!eventGroups[dateStr]) {
+                    eventGroups[dateStr] = [];
+                }
+                eventGroups[dateStr].push(event);
+            });
+
+            // Iterate through the grouped events
+            for (const dateStr in eventGroups) {
+                const groupedEvents = eventGroups[dateStr];
+                let htmlLine = `
+                                                        <div class="appointment-group">
+                                                            <div class="date">${dateStr}</div>
+                                                    `;
+                lines++;
+
+                groupedEvents.forEach(event => {
+                    const start = new Date(event.start.dateTime || event.start.date);
+                    const end = new Date(event.end.dateTime || event.end.date);
+                    const isCurrent = !currentFound && start <= now && now < end;
+                    if (isCurrent) {
+                        currentFound = true;
+                    }
+
+                    htmlLine += EventData(event);
+                    lines++;
+                });
+
+                htmlLine += '</div>';
+
+                // Fill columns
+                if (lines <= 2 * maxLines - 1) {
+                    if (lines <= maxLines) {
+                        htmlLeft += htmlLine;
+                    } else if(! useBG){
+                        htmlRight += htmlLine;
+                    }
+                }
+            }
+
+
+            // Construct the final layout
+            document.getElementById('appointments').innerHTML = `
+                                                    <div class="columnleft">
+                                                        ${htmlLeft}
+                                                    </div>
+                                                    <div class="columnright">
+                                                        ${htmlRight}
+                                                    </div>
+                                                `;
+        }
+
+        function EventData(event) {
+            const start = new Date(event.start.dateTime || event.start.date);
+            const end = new Date(event.end.dateTime || event.end.date);
+            const title = event.summary || 'onbekend';
+            const loc = event.location || '';
+            const timeStr = start.toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit' }) +
+                ' - ' + end.toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+
+            //  const dutchDayOfWeek = getDutchDayOfWeek(event); // Get the Dutch day of the week
+
+            return `<div class="event">
+                                                            <h class="time">${timeStr}</h>
+                                                            <h class="title">${title}</h>
+                                                            <h class="location">${loc}</h>
+                                                        </div>`;
+        }
+
+        function EventData1(event) {
+            const start = new Date(event.start.date);
+            const end = new Date(event.end.date);
+            const title = event.summary || 'onbekend';
+            const loc = event.location || '';
+            const Dow = start.toLocaleString('nl-NL', { weekday: 'long' });
+            const dateStr = start.toLocaleString('nl-NL', { day: '2-digit', month: '2-digit' });
+            const timeStr = start.toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit' }) +
+                ' - ' + end.toLocaleString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+            return `<div>
+                                                            <h class="location">${Dow}</h>
+                                                            <h class="time">${timeStr}</h>
+                                                            <h class="title"> ${title}</h>
+                                                            <h class="location"> ${loc}</h>
+                                                        </div>`;
+        }
+        // Include the Dutch day of week function
+        function getDutchDayOfWeek(event) {
+            // const startDate = event.start  ;
+            //return "=>"+startDate.toLocaleString('nl-NL', { weekday: 'long' }); // `long` gives full weekday name
+            return event.start.toLocaleString('nl-NL', { weekday: 'long' });
+        }
+        function scheduleRefresh(events) {
+            const now = new Date();
+            let timeUntilRefresh = 60 * 60 * 1000; // Default: 1 uur
+
+            if (events && events.length > 0) {
+                const currentEvent = events.find(event => {
+                    const start = new Date(event.start.date);
+                    const end = new Date(event.end.date);
+                    return start <= now && now < end;
+                });
+
+                if (currentEvent) {
+                    const end = new Date(currentEvent.end.date);
+                    const timeToEnd = end - now;
+                    if (timeToEnd > 0) {
+                        timeUntilRefresh = Math.min(timeUntilRefresh, timeToEnd);
+                    }
+                }
+            }
+
+            const nextHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + 1, 0, 0, 0);
+            timeUntilRefresh = Math.min(timeUntilRefresh, nextHour - now);
+
+            if (timeUntilRefresh <= 0) {
+                timeUntilRefresh = 60 * 60 * 1000; // Fallback naar 1 uur
+            }
+
+            setTimeout(() => location.reload(), timeUntilRefresh);
+        }
+
+        // Start laden
+        initCalendar();
+    </script>
 </body>
 </html>
