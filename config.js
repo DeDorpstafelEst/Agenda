@@ -48,6 +48,7 @@ fetch('config.json')
         if (fontSizeParam && !isNaN(parseInt(fontSizeParam))) {
             CONFIG.fontSize = parseInt(fontSizeParam);
             document.body.style.fontSize = CONFIG.fontSize + 'px';
+            document.html.style.fontSize = CONFIG.fontSize + 'px'
         }
 
         const bgParam = getParam('bg');
