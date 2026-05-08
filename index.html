@@ -134,6 +134,8 @@
         <div class="appointments" id="appointments">
             <!--  <div class="loading">Laden gegevens...</div>-->
         </div>
+        <div class="debug" id="debug">
+        </div>
     </div>
 
     <script src="https://apis.google.com/js/api.js"></script>
@@ -144,16 +146,21 @@
         let currentAppointmentEnd = null;
         let maxLines = 15; // Maximaal aantal regels (inclusief datums)
         let fontSize = 21; //  
-        
+       
+        document.getElementById('debug').innerHTML =${getParams()}<br/>';
+       
         // Handle background color from URL parameter FIRST
         const maxLinesValue = getParam('mxl');
+        document.getElementById('debug').innerHTML =${document.getElementById('debug')}  ${maxLinesValue}  ${typeof maxLinesValue}<br/>';
         if( maxLinesValue.trim() !== '') maxLines = parseInt(maxLinesValue.trim());
         
         const FontSizeValue = getParam('fs');
+        document.getElementById('debug').innerHTML =${document.getElementById('debug')}  ${FontSizeValue}  ${typeof FontSizeValue}<br/>';
         if( FontSizeValue.trim() !== '') fontSize = parseInt(FontSizeValue.trim());
         document.body.style.fontSize = fontSize;
         
         const backgroundValue = getParam('bg'); 
+             document.getElementById('debug').innerHTML =${document.getElementById('debug')}  ${backgroundValue}  ${typeof backgroundValue}<br/>';
         const useBG = (typeof backgroundValue === 'string' && backgroundValue.trim() !== '');
         if (useBG) 
         {
