@@ -39,12 +39,12 @@ fetch('config.json')
     })
     .finally(() => {
         // Load optional URL parameters
-        const maxLinesParam = getParam('maxLines');
+        const maxLinesParam = getParam('ml');
         if (maxLinesParam && !isNaN(parseInt(maxLinesParam))) {
             CONFIG.maxLines = parseInt(maxLinesParam);
         }
 
-        const fontSizeParam = getParam('fontSize');
+        const fontSizeParam = getParam('fs');
         if (fontSizeParam && !isNaN(parseInt(fontSizeParam))) {
             CONFIG.fontSize = parseInt(fontSizeParam);
             document.body.style.fontSize = CONFIG.fontSize + 'px';
